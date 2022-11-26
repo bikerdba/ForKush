@@ -63,16 +63,20 @@ $exeFilePath = (Get-Command python).Source
 WriteLog "sucessfully installed python version $pyVersion at $exeFilePath"
 WriteLog "setting up and upgrading pip ...."
 Start-Process -FilePath $exeFilePath -ArgumentList "get-pip.py" -Wait
-Invoke-Command -ScriptBlock { python -m pip install --upgrade pip } -Verbose
-WriteLog "installing vistualenv ...."
-Invoke-Command -ScriptBlock { python -m pip install --user virtualenv } -Verbose
-WriteLog "setting up TestPlanOSSPath = $($config.TestPlanOSSPath) ... "
-Invoke-Command -ScriptBlock { python virtualenv -p $($config.TestPlanOSSPath) }
-WriteLog "setting up TestPlanPath .... "
+Invoke-Command -ScriptBlock { python -m pip install --upgrade pip --quiet } -Verbose
+WriteLog "installing and setting up virtualenv .... at $($config.TestPlanOSSPath) "
+Invoke-Command -ScriptBlock { python -m pip install --user virtualenv --quiet } -Verbose
+Invoke-Command -ScriptBlock { python -m venv $($config.TestPlanOSSPath) }
+WriteLog "setting up TestPlanPath .... at $($config.TestPlanPath) "
+
 if (!(Test-Path $($config.TestPlanPath))) {
-    New-Item $($config.TestPlanPath) -ItemType Directory
+    New-Item $($config.TestPlanPath) -ItemType Directory | Out-Null
+}
+else {
+    Remove-Item -LiteralPath $($config.TestPlanPath) -Force -Recurse | Out-Null
+    New-Item $($config.TestPlanPath) -ItemType Directory | Out-Null
 }
 WriteLog "cloning git repo from https://github.com/morganstanley/testplan.git"
-Invoke-Command -ScriptBlock {Set-Location $($config.TestPlanPath)}
-Invoke-Command -ScriptBlock {git clone https://github.com/morganstanley/testplan.git}
+Invoke-Command -ScriptBlock { Set-Location $($config.TestPlanPath) }
+Invoke-Command -ScriptBlock { git clone https://github.com/morganstanley/testplan.git }
 
