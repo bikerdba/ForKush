@@ -1,0 +1,6 @@
+{
+    "PythonVersion" : "3.7.0",
+    "PythonInstallArgs": "/quiet InstallAllUsers=1 PrependPath=1 Include_test=1",
+    "TestPlanOSSPath": "C:\\temp\\testplan-oss",
+    "TestPlanPath": "C:\\temp\\testplan"
+}
